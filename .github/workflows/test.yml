@@ -85,12 +85,6 @@ jobs:
         #   # allow_failure: true
         #   test_mypyc: true
 
-        - name: mypyc runtime tests with py313-macos
-          python: '3.13'
-          os: macos-latest
-          toxenv: py
-          tox_extra_args: "-n 3 mypyc/test/test_run.py mypyc/test/test_external.py"
-
         - name: mypyc runtime tests with py310-ubuntu
           python: '3.10'
           os: ubuntu-latest
