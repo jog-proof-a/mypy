@@ -71,11 +71,27 @@ jobs:
           toxenv: py
           tox_extra_args: "-n 4"
           test_mypyc: true
-        - name: Test suite with py314-windows-64
+        # The full suite on Windows takes much longer than on any other runner
+        # (it used to be the slowest job in this workflow), so split it into
+        # three shards of roughly equal duration. Together they collect
+        # exactly the same tests as a plain "pytest" run (testpaths in
+        # pyproject.toml). Note the trailing "::" in the deselect: without
+        # it, the prefix would also match TestRunMultiFile, TestRunSeparate, etc.
+        - name: Test suite with py314-windows-64 (mypyc run tests)
           python: '3.14'
           os: windows-latest
           toxenv: py
-          tox_extra_args: "-n 4"
+          tox_extra_args: "-n 4 mypyc/test/test_run.py::TestRun"
+        - name: Test suite with py314-windows-64 (other mypyc tests)
+          python: '3.14'
+          os: windows-latest
+          toxenv: py
+          tox_extra_args: "-n 4 mypyc/test --deselect mypyc/test/test_run.py::TestRun::"
+        - name: Test suite with py314-windows-64 (mypy tests)
+          python: '3.14'
+          os: windows-latest
+          toxenv: py
+          tox_extra_args: "-n 4 mypy/test"
 
         # - name: Test suite with py315-dev-ubuntu
         #   python: '3.15-dev'
