@@ -71,11 +71,19 @@ jobs:
           toxenv: py
           tox_extra_args: "-n 4"
           test_mypyc: true
-        - name: Test suite with py314-windows-64
+        # The longest jobs are split in two with --shard (see conftest.py):
+        # every test runs in exactly one shard, so the shards together run
+        # the same tests as one job did, in about half the time.
+        - name: Test suite with py314-windows-64 (shard 1/2)
           python: '3.14'
           os: windows-latest
           toxenv: py
-          tox_extra_args: "-n 4"
+          tox_extra_args: "-n 4 --shard=1/2"
+        - name: Test suite with py314-windows-64 (shard 2/2)
+          python: '3.14'
+          os: windows-latest
+          toxenv: py
+          tox_extra_args: "-n 4 --shard=2/2"
 
         # - name: Test suite with py315-dev-ubuntu
         #   python: '3.15-dev'
@@ -107,16 +115,27 @@ jobs:
         #   tox_extra_args: "-n 4 mypyc/test/test_run.py mypyc/test/test_external.py"
         #   debug_build: true
 
-        - name: Parallel tests with py314-ubuntu, interpreted
+        - name: Parallel tests with py314-ubuntu, interpreted (shard 1/2)
           python: '3.14'
           os: ubuntu-24.04-arm
           toxenv: py
-          tox_extra_args: "-n 4 --mypy-num-workers=4 mypy/test/testcheck.py"
-        - name: Parallel tests with py314-ubuntu, mypyc-compiled
+          tox_extra_args: "-n 4 --mypy-num-workers=4 --shard=1/2 mypy/test/testcheck.py"
+        - name: Parallel tests with py314-ubuntu, interpreted (shard 2/2)
           python: '3.14'
           os: ubuntu-24.04-arm
           toxenv: py
-          tox_extra_args: "-n 4 --mypy-num-workers=4 mypy/test/testcheck.py"
+          tox_extra_args: "-n 4 --mypy-num-workers=4 --shard=2/2 mypy/test/testcheck.py"
+        - name: Parallel tests with py314-ubuntu, mypyc-compiled (shard 1/2)
+          python: '3.14'
+          os: ubuntu-24.04-arm
+          toxenv: py
+          tox_extra_args: "-n 4 --mypy-num-workers=4 --shard=1/2 mypy/test/testcheck.py"
+          test_mypyc: true
+        - name: Parallel tests with py314-ubuntu, mypyc-compiled (shard 2/2)
+          python: '3.14'
+          os: ubuntu-24.04-arm
+          toxenv: py
+          tox_extra_args: "-n 4 --mypy-num-workers=4 --shard=2/2 mypy/test/testcheck.py"
           test_mypyc: true
         - name: Parallel tests with py314-windows-64, interpreted
           python: '3.14'
